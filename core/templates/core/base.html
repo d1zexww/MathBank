@@ -1,0 +1,111 @@
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'core/style.css' %}">
+
+    <title>{% block title %}MathBank{% endblock %}</title>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+<div class="student-dashboard">
+
+    <!-- Боковое меню -->
+    <aside class="student-sidebar">
+
+        <a href="{% url 'accounts:dashboard' %}" class="logo">
+            MathBank
+        </a>
+
+        <p class="sidebar-section-title">
+            УЧЕБНОЕ ПРОСТРАНСТВО
+        </p>
+
+        <nav class="sidebar-nav">
+
+            <a href="{% url 'accounts:dashboard' %}"
+               class="sidebar-link {% if active_page == 'dashboard' %}active{% endif %}">
+                Обзор
+            </a>
+
+            <a href="{% url 'diagnostics:start' %}"
+               class="sidebar-link {% if active_page == 'diagnostics' %}active{% endif %}">
+                Пройти диагностику
+            </a>
+
+            <a href="{% url 'diagnostics:history' %}"
+               class="sidebar-link {% if active_page == 'history' %}active{% endif %}">
+                История результатов
+            </a>
+
+            <a href="#roadmap" class="sidebar-link">
+                Мой Roadmap
+            </a>
+
+            <a href="#study-tools" class="sidebar-link">
+                Инструменты
+            </a>
+
+            <a href="{% url 'accounts:profile' %}"
+               class="sidebar-link {% if active_page == 'profile' %}active{% endif %}">
+                Мой профиль
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+
+            <!-- Информация об основателе -->
+            <div class="sidebar-founder">
+
+                <div class="founder-icon">
+                    MB
+                </div>
+
+                <div class="founder-info">
+                    <span class="founder-name">
+    Кирилл Лысков
+</span>
+
+                    <span class="founder-role">
+                        FOUNDER & CEO
+                    </span>
+                </div>
+
+            </div>
+
+            <form method="POST" action="{% url 'accounts:logout' %}">
+                {% csrf_token %}
+
+                <button type="submit" class="sidebar-logout">
+                    Выйти из аккаунта
+                </button>
+            </form>
+
+        </div>
+
+    </aside>
+
+    <!-- Основная часть -->
+    <main class="dashboard-main">
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+</div>
+
+{% block extra_scripts %}{% endblock %}
+
+</body>
+</html>

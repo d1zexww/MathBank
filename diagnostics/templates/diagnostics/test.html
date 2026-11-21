@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'core/style.css' %}">
+
+    <title>Диагностический тест — MathBank</title>
+
+    <!-- Настройки математических формул -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)'], ['$', '$']],
+                displayMath: [['\\[', '\\]'], ['$$', '$$']],
+                processEscapes: true
+            },
+            options: {
+                skipHtmlTags: [
+                    'script', 'noscript', 'style',
+                    'textarea', 'pre', 'code'
+                ]
+            },
+            chtml: {
+                scale: 1.1
+            }
+        };
+    </script>
+
+    <!-- Загрузка MathJax -->
+    <script
+        defer
+        src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js">
+    </script>
+
+    <style>
+        .diagnostic-question {
+            margin-bottom: 28px;
+            padding: 24px;
+            border-radius: 16px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            line-height: 1.8;
+            margin: 18px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .question-image {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .question-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+        }
+
+        .diagnostic-input {
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
+
+        mjx-container {
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        @media (max-width: 600px) {
+            .diagnostic-card {
+                padding: 18px;
+            }
+
+            .question-text {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="diagnostic-page">
+
+    <div class="diagnostic-card">
+
+        <a href="/" class="logo">MathBank</a>
+
+        <p class="dashboard-eyebrow">
+            DIAGNOSTIC TEST
+        </p>
+
+        <h1>Диагностика знаний</h1>
+
+        <p>
+            Предмет:
+
+            {% if attempt.subject == 'profile_math' %}
+                Профильная математика
+            {% elif attempt.subject == 'russian' %}
+                Русский язык
+            {% elif attempt.subject == 'english' %}
+                Английский язык
+            {% elif attempt.subject == 'informatics' %}
+                Информатика
+            {% else %}
+                {{ attempt.subject }}
+            {% endif %}
+        </p>
+
+        <p>
+            Количество заданий: {{ answers|length }}
+        </p>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            {% for item in answers %}
+
+                <div class="diagnostic-question">
+
+                    <h3>
+                        Задание {{ forloop.counter }}
+                    </h3>
+
+                    <div class="question-text">
+                        {{ item.question.question_text }}
+                    </div>
+
+                    {% if item.question.image %}
+
+                        <div class="question-image">
+
+                            <img
+                                src="{{ item.question.image.url }}"
+                                alt="Изображение к заданию {{ forloop.counter }}"
+                            >
+
+                        </div>
+
+                    {% endif %}
+
+                    <label for="answer_{{ item.question_id }}">
+                        Твой ответ
+                    </label>
+
+                    <input
+                        type="text"
+                        id="answer_{{ item.question_id }}"
+                        name="answer_{{ item.question_id }}"
+                        class="diagnostic-input"
+                        placeholder="Введи ответ"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+            {% endfor %}
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                Завершить диагностику
+            </button>
+
+        </form>
+
+    </div>
+
+</main>
+
+</body>
+</html>

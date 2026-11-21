@@ -1,0 +1,61 @@
+
+{% extends 'core/base.html' %}
+
+{% block title %}Мой профиль — MathBank{% endblock %}
+
+{% block content %}
+
+<header class="dashboard-heading">
+
+    <div>
+        <p class="dashboard-eyebrow">
+            ЛИЧНЫЙ КАБИНЕТ
+        </p>
+
+        <h1>Мой профиль</h1>
+
+        <p>
+            Управляй своей информацией и целями подготовки.
+        </p>
+    </div>
+
+    <span class="student-badge">
+        Профиль ученика
+    </span>
+
+</header>
+
+
+<section class="dashboard-section">
+
+    <div class="dashboard-section-heading">
+
+        <div>
+            <h2>Личные данные</h2>
+
+            <p>
+                Заполни информацию, которая поможет настроить MathBank.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="profile-card">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button type="submit" class="primary-button">
+                Сохранить профиль
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

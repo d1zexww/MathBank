@@ -1,0 +1,328 @@
+
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Результаты диагностики — MathBank{% endblock %}
+
+{% block extra_head %}
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<section class="mb-result-page">
+
+    <!-- Верхний блок -->
+    <div class="mb-result-hero">
+        <div class="mb-result-hero-content">
+            <span class="mb-eyebrow">DIAGNOSTIC RESULTS</span>
+
+            <h1>Диагностика завершена!</h1>
+
+            <p>
+                Ты прошёл диагностику по предмету
+                <strong>{{ subject_name }}</strong>.
+                Давай посмотрим на результат.
+            </p>
+        </div>
+
+        <div class="mb-result-score">
+            <div class="mb-result-score-circle">
+                <span>{{ percentage }}%</span>
+                <small>точность</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основная статистика -->
+    <div class="mb-result-stats">
+
+        <div class="mb-result-stat-card">
+            <span class="mb-result-stat-icon">✓</span>
+            <div>
+                <strong>{{ correct_count }}</strong>
+                <span>Правильных ответов</span>
+            </div>
+        </div>
+
+        <div class="mb-result-stat-card">
+            <span class="mb-result-stat-icon">✕</span>
+            <div>
+                <strong>{{ wrong_count }}</strong>
+                <span>Ошибок</span>
+            </div>
+        </div>
+
+        <div class="mb-result-stat-card">
+            <span class="mb-result-stat-icon">○</span>
+            <div>
+                <strong>{{ skipped_count }}</strong>
+                <span>Пропущено</span>
+            </div>
+        </div>
+
+        <div class="mb-result-stat-card">
+            <span class="mb-result-stat-icon">◎</span>
+            <div>
+                <strong>{{ attempt.total_questions }}</strong>
+                <span>Всего заданий</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Общий анализ -->
+    <div class="mb-result-analysis">
+
+        <div class="mb-result-section-heading">
+            <div>
+                <span class="mb-eyebrow">YOUR PERFORMANCE</span>
+                <h2>Твой результат</h2>
+            </div>
+
+            <span class="mb-result-percentage">{{ percentage }}%</span>
+        </div>
+
+        <div class="mb-result-progress-track">
+            <div
+                class="mb-result-progress-fill"
+                style="width: {{ percentage }}%;">
+            </div>
+        </div>
+
+        <div class="mb-result-progress-labels">
+            <span>0%</span>
+            <span>100%</span>
+        </div>
+
+        <p class="mb-result-comment">
+            {% if percentage >= 80 %}
+                Отличный результат! Ты хорошо справился с диагностикой.
+            {% elif percentage >= 50 %}
+                Хорошая основа! Теперь можно разобрать ошибки и закрепить знания.
+            {% else %}
+                Диагностика помогла определить темы, которым стоит уделить больше внимания.
+            {% endif %}
+        </p>
+
+    </div>
+
+    <!-- Анализ по темам -->
+    <div class="mb-result-analysis mb-topic-analysis">
+
+        <div class="mb-result-section-heading">
+            <div>
+                <span class="mb-eyebrow">TOPIC PERFORMANCE</span>
+                <h2>Анализ по темам</h2>
+                <p>Посмотри, какие темы уже получаются хорошо, а какие стоит повторить.</p>
+            </div>
+        </div>
+
+        {% if topic_statistics %}
+
+            <div class="mb-topic-list">
+
+                {% for topic in topic_statistics %}
+
+                    <div class="mb-topic-card">
+
+                        <div class="mb-topic-card-header">
+
+                            <div>
+                                <h3>{{ topic.topic }}</h3>
+                                <span>
+                                    {{ topic.correct }} из {{ topic.total }} правильных
+                                </span>
+                            </div>
+
+                            <strong>{{ topic.percentage }}%</strong>
+
+                        </div>
+
+                        <div class="mb-topic-progress-track">
+                            <div
+                                class="mb-topic-progress-fill
+                                {% if topic.percentage >= 80 %}
+                                    topic-good
+                                {% elif topic.percentage >= 50 %}
+                                    topic-medium
+                                {% else %}
+                                    topic-weak
+                                {% endif %}"
+                                style="width: {{ topic.percentage }}%;">
+                            </div>
+                        </div>
+
+                        <div class="mb-topic-details">
+
+                            <span>✓ {{ topic.correct }} верно</span>
+                            <span>✕ {{ topic.wrong }} ошибок</span>
+                            <span>○ {{ topic.skipped }} пропущено</span>
+
+                        </div>
+
+                        {% if topic.percentage < 50 %}
+                            <div class="mb-topic-recommendation">
+                                Стоит уделить этой теме больше внимания.
+                            </div>
+                        {% elif topic.percentage < 80 %}
+                            <div class="mb-topic-recommendation">
+                                Есть над чем поработать. Повтори основные задания.
+                            </div>
+                        {% else %}
+                            <div class="mb-topic-recommendation">
+                                Хороший результат! Продолжай закреплять знания.
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <p>Пока недостаточно данных для анализа по темам.</p>
+
+        {% endif %}
+
+    </div>
+
+    <!-- Разбор заданий -->
+    <div class="mb-result-review">
+
+        <div class="mb-result-section-heading">
+            <div>
+                <span class="mb-eyebrow">DETAILED REVIEW</span>
+                <h2>Разбор заданий</h2>
+                <p>Посмотри, где получилось справиться, а что стоит повторить.</p>
+            </div>
+        </div>
+
+        <div class="mb-review-list">
+
+            {% for answer in answers %}
+
+                <article class="mb-review-card
+                    {% if not answer.user_answer %}
+                        is-skipped
+                    {% elif answer.is_correct %}
+                        is-correct
+                    {% else %}
+                        is-wrong
+                    {% endif %}">
+
+                    <div class="mb-review-card-header">
+
+                        <div class="mb-review-number">
+                            {{ forloop.counter|stringformat:"02d" }}
+                        </div>
+
+                        <div class="mb-review-title">
+                            <span class="mb-eyebrow">ЗАДАНИЕ {{ forloop.counter }}</span>
+
+                            <h3>
+                                {% if not answer.user_answer %}
+                                    Пропущено
+                                {% elif answer.is_correct %}
+                                    Ответ верный
+                                {% else %}
+                                    Нужно повторить
+                                {% endif %}
+                            </h3>
+                        </div>
+
+                        <span class="mb-review-status">
+                            {% if not answer.user_answer %}
+                                ○
+                            {% elif answer.is_correct %}
+                                ✓
+                            {% else %}
+                                ✕
+                            {% endif %}
+                        </span>
+
+                    </div>
+
+                    <div class="mb-review-question">
+                        {{ answer.question.question_text|linebreaksbr }}
+                    </div>
+
+                    {% if answer.question.image %}
+                        <div class="mb-review-image">
+                            <img
+                                src="{{ answer.question.image.url }}"
+                                alt="Изображение к заданию {{ forloop.counter }}"
+                            >
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-review-answers">
+
+                        <div class="mb-review-answer">
+                            <span>Твой ответ</span>
+                            <strong>
+                                {{ answer.user_answer|default:"Нет ответа" }}
+                            </strong>
+                        </div>
+
+                        <div class="mb-review-answer correct-answer">
+                            <span>Правильный ответ</span>
+                            <strong>{{ answer.question.correct_answer }}</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="mb-explanation">
+                        <span class="mb-eyebrow">SOLUTION</span>
+                        <h4>Объяснение решения</h4>
+
+                        <div>
+                            {{ answer.question.explanation|default:"Объяснение пока не добавлено."|linebreaksbr }}
+                        </div>
+                    </div>
+
+                </article>
+
+            {% empty %}
+
+                <p>Пока нет данных для разбора заданий.</p>
+
+            {% endfor %}
+
+        </div>
+    </div>
+
+    <!-- Следующий шаг -->
+    <div class="mb-result-next">
+        <div>
+            <span class="mb-eyebrow">WHAT'S NEXT?</span>
+            <h2>Продолжим обучение?</h2>
+            <p>Закрепи результат и попробуй улучшить свой следующий показатель.</p>
+        </div>
+
+        <div class="mb-result-actions">
+            <a href="{% url 'diagnostics:start' %}" class="mb-result-primary-btn">
+                Пройти ещё раз
+            </a>
+
+            <a href="{% url 'accounts:dashboard' %}" class="mb-result-secondary-btn">
+                В личный кабинет
+            </a>
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        if (window.MathJax) {
+            MathJax.typesetPromise();
+        }
+    });
+</script>
+{% endblock %}

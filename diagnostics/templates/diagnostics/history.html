@@ -1,0 +1,313 @@
+
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Мой прогресс — MathBank{% endblock %}
+
+{% block content %}
+
+<section class="mb-history-page">
+
+    <!-- Верхняя панель -->
+    <header class="mb-history-hero">
+
+        <div class="mb-history-hero-content">
+            <span class="mb-eyebrow">YOUR LEARNING ANALYTICS</span>
+
+            <h1>Твой прогресс</h1>
+
+            <p>
+                Отслеживай результаты, анализируй свои достижения
+                и постепенно приближайся к своей цели.
+            </p>
+        </div>
+
+        <div class="mb-history-hero-badge">
+            <span class="mb-history-hero-badge-icon">↗</span>
+            <span>Твоя статистика<br>подготовки</span>
+        </div>
+
+    </header>
+
+
+    <!-- Карточки статистики -->
+    <div class="mb-history-stats">
+
+        <article class="mb-history-stat-card">
+            <div class="mb-history-stat-top">
+                <span class="mb-history-stat-label">Всего диагностик</span>
+                <span class="mb-history-stat-icon">▤</span>
+            </div>
+
+            <strong>{{ total_attempts }}</strong>
+
+            <small>Завершённых попыток</small>
+        </article>
+
+
+        <article class="mb-history-stat-card">
+            <div class="mb-history-stat-top">
+                <span class="mb-history-stat-label">Средний результат</span>
+                <span class="mb-history-stat-icon">◷</span>
+            </div>
+
+            <strong>{{ average_percentage }}%</strong>
+
+            <small>Средний процент правильных ответов</small>
+        </article>
+
+
+        <article class="mb-history-stat-card">
+            <div class="mb-history-stat-top">
+                <span class="mb-history-stat-label">Лучший результат</span>
+                <span class="mb-history-stat-icon">✦</span>
+            </div>
+
+            <strong>{{ best_percentage }}%</strong>
+
+            <small>Твой личный рекорд</small>
+        </article>
+
+    </div>
+
+
+    <!-- График прогресса -->
+    <section class="mb-history-panel">
+
+        <div class="mb-history-section-heading">
+            <div>
+                <span class="mb-eyebrow">PERFORMANCE</span>
+                <h2>Динамика результатов</h2>
+                <p>Как менялись твои результаты от диагностики к диагностике</p>
+            </div>
+
+            <span class="mb-history-chart-label">
+                Последовательность попыток
+            </span>
+        </div>
+
+
+        {% if chart_items %}
+
+            <div class="mb-history-chart">
+
+                <div class="mb-history-chart-y-axis">
+                    <span>100%</span>
+                    <span>75%</span>
+                    <span>50%</span>
+                    <span>25%</span>
+                    <span>0%</span>
+                </div>
+
+                <div class="mb-history-chart-area">
+
+                    <div class="mb-history-chart-grid">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+
+                    <div class="mb-history-chart-bars">
+
+                        {% for item in chart_items %}
+
+                            <div class="mb-history-chart-column">
+
+                                <div class="mb-history-chart-value">
+                                    {{ item.percentage }}%
+                                </div>
+
+                                <div class="mb-history-chart-bar"
+                                     style="height: {{ item.percentage }}%;">
+
+                                </div>
+
+                                <span class="mb-history-chart-index">
+                                    {{ forloop.counter }}
+                                </span>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="mb-history-chart-legend">
+                <span class="mb-history-legend-dot"></span>
+                Результаты диагностик
+            </div>
+
+            {% if total_attempts < 2 %}
+                <p class="mb-history-chart-hint">
+                    Пройди ещё несколько диагностик, чтобы увидеть
+                    динамику изменения результатов.
+                </p>
+            {% endif %}
+
+        {% else %}
+
+            <div class="mb-history-chart-empty">
+                <span>▥</span>
+                <p>Пока недостаточно данных для построения графика.</p>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- История попыток -->
+    <section class="mb-history-panel mb-history-activity">
+
+        <div class="mb-history-section-heading">
+
+            <div>
+                <span class="mb-eyebrow">RECENT ACTIVITY</span>
+                <h2>История диагностик</h2>
+                <p>Все твои завершённые попытки</p>
+            </div>
+
+            <a href="{% url 'diagnostics:start' %}"
+               class="mb-history-new-btn">
+                + Новая диагностика
+            </a>
+
+        </div>
+
+
+        <!-- Фильтр -->
+        <form method="GET" class="mb-history-filter">
+
+            <div class="mb-history-filter-info">
+                <span>Предмет</span>
+                <small>Выбери направление подготовки</small>
+            </div>
+
+            <div class="mb-history-filter-controls">
+
+                <select name="subject" class="mb-history-select">
+
+                    <option value="">Все предметы</option>
+
+                    {% for subject_code, subject_name in subjects %}
+
+                        <option value="{{ subject_code }}"
+                            {% if selected_subject == subject_code %}selected{% endif %}>
+                            {{ subject_name }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <button type="submit" class="mb-history-filter-btn">
+                    Применить
+                </button>
+
+                {% if selected_subject %}
+                    <a href="{% url 'diagnostics:history' %}"
+                       class="mb-history-reset">
+                        Сбросить
+                    </a>
+                {% endif %}
+
+            </div>
+
+        </form>
+
+
+        <!-- Список -->
+        <div class="mb-history-list">
+
+            {% for item in history_items %}
+
+                <article class="mb-history-item">
+
+                    <div class="mb-history-item-number">
+                        {{ forloop.counter|stringformat:"02d" }}
+                    </div>
+
+
+                    <div class="mb-history-item-main">
+
+                        <div class="mb-history-item-title">
+                            <h3>{{ item.subject_name }}</h3>
+
+                            <span class="mb-history-date">
+                                {{ item.attempt.completed_at|date:"d.m.Y · H:i" }}
+                            </span>
+                        </div>
+
+                        <p>
+                            {{ item.attempt.score }}
+                            из
+                            {{ item.attempt.total_questions }}
+                            правильных ответов
+                        </p>
+
+                        <div class="mb-history-progress-track">
+                            <div class="mb-history-progress-fill"
+                                 style="width: {{ item.percentage }}%;">
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mb-history-item-result">
+
+                        <strong>{{ item.percentage }}%</strong>
+
+                        <span>Результат</span>
+
+                    </div>
+
+
+                    <a href="{% url 'diagnostics:result' item.attempt.id %}"
+                       class="mb-history-open-btn">
+                        Разбор
+                        <span>→</span>
+                    </a>
+
+                </article>
+
+            {% empty %}
+
+                <div class="mb-history-empty">
+
+                    <div class="mb-history-empty-icon">◎</div>
+
+                    <h3>
+                        {% if selected_subject %}
+                            По этому предмету пока нет диагностик
+                        {% else %}
+                            История пока пуста
+                        {% endif %}
+                    </h3>
+
+                    <p>
+                        Пройди диагностику, чтобы начать
+                        отслеживать свой прогресс.
+                    </p>
+
+                    <a href="{% url 'diagnostics:start' %}">
+                        Начать диагностику
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</section>
+
+{% endblock %}

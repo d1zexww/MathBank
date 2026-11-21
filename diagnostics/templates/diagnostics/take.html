@@ -1,0 +1,366 @@
+
+{% extends 'core/base.html' %}
+
+{% block title %}Диагностика — MathBank{% endblock %}
+
+{% block extra_head %}
+<script>
+    window.MathJax = {
+        tex: {
+            inlineMath: [['\\(', '\\)'], ['$', '$']]
+        }
+    };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-v2-session">
+
+    <header class="mb-v2-header">
+        <div class="mb-v2-brand">
+            <div class="mb-v2-logo">M</div>
+            <div>
+                <strong>MATHBANK</strong>
+                <span>LEARNING PLATFORM</span>
+            </div>
+        </div>
+
+        <div class="mb-v2-session-label">
+            <span class="mb-v2-live-dot"></span>
+            Диагностика проходит
+        </div>
+    </header>
+
+    <section class="mb-v2-hero">
+        <div class="mb-v2-hero-top">
+            <div>
+                <span class="mb-v2-eyebrow">ТВОЯ УЧЕБНАЯ СЕССИЯ</span>
+                <h1>Время показать свои знания</h1>
+                <p>
+                    Решай задания в своём темпе. MathBank поможет
+                    определить твой текущий уровень подготовки.
+                </p>
+            </div>
+
+            <div class="mb-v2-hero-symbol">✦</div>
+        </div>
+
+        <div class="mb-v2-progress-info">
+            <div>
+                <span>Выполнено заданий</span>
+                <strong>
+                    <span id="mb-answered-count">0</span>
+                    <span class="mb-v2-muted">/ {{ answers|length }}</span>
+                </strong>
+            </div>
+
+            <strong class="mb-v2-percent" id="mb-progress-percent">0%</strong>
+        </div>
+
+        <div class="mb-v2-progress-track">
+            <div class="mb-v2-progress-fill" id="mb-progress-fill"></div>
+        </div>
+    </section>
+
+    <div class="mb-v2-workspace">
+
+        <main class="mb-v2-main">
+
+            <div class="mb-v2-section-heading">
+                <div>
+                    <span class="mb-v2-eyebrow">ПРАКТИКА</span>
+                    <h2>Задания диагностики</h2>
+                    <p>Внимательно прочитай условие и введи ответ.</p>
+                </div>
+
+                <div class="mb-v2-total">
+                    {{ answers|length }} заданий
+                </div>
+            </div>
+
+            <form method="POST" id="mb-diagnostic-form">
+                {% csrf_token %}
+
+                <div class="mb-v2-question-list">
+
+                    {% for answer in answers %}
+
+                    <article
+                        class="mb-v2-question-card"
+                        id="mb-question-{{ forloop.counter }}"
+                    >
+
+                        <div class="mb-v2-question-top">
+                            <div class="mb-v2-question-index">
+                                {{ forloop.counter|stringformat:"02d" }}
+                            </div>
+
+                            <div class="mb-v2-question-heading">
+                                <span class="mb-v2-eyebrow">
+                                    ВОПРОС {{ forloop.counter }} ИЗ {{ answers|length }}
+                                </span>
+
+                                <h3>
+                                    {% if answer.question.topic %}
+                                        {{ answer.question.topic }}
+                                    {% else %}
+                                        Задание {{ forloop.counter }}
+                                    {% endif %}
+                                </h3>
+                            </div>
+
+                            {% if answer.question.ege_task_number %}
+                                <span class="mb-v2-task-tag">
+                                    ЕГЭ · №{{ answer.question.ege_task_number }}
+                                </span>
+                            {% else %}
+                                <span class="mb-v2-task-tag">
+                                    MATHBANK
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-v2-question-divider"></div>
+
+                        <div class="mb-v2-question-body">
+                            <span class="mb-v2-content-label">УСЛОВИЕ ЗАДАНИЯ</span>
+
+                            <div class="mb-v2-question-text">
+                                {{ answer.question.question_text|linebreaksbr }}
+
+                                {% if answer.question.image %}
+                                    <img
+                                        src="{{ answer.question.image.url }}"
+                                        alt="Изображение задания"
+                                        class="mb-v2-question-image"
+                                    >
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-v2-answer-area">
+                            <label
+                                for="answer-{{ answer.question.id }}"
+                                class="mb-v2-content-label"
+                            >
+                                ТВОЙ ОТВЕТ
+                            </label>
+
+                            <input
+                                type="text"
+                                id="answer-{{ answer.question.id }}"
+                                class="mb-v2-answer-input js-mb-answer"
+                                name="question_{{ answer.question.id }}"
+                                placeholder="Введи ответ..."
+                                required
+                                autocomplete="off"
+                            >
+
+                            <div class="mb-v2-answer-hint">
+                                <span>↳</span>
+                                Проверь ответ перед завершением диагностики.
+                            </div>
+                        </div>
+
+                        <div class="mb-v2-question-bottom">
+                            <span>Задание {{ forloop.counter }}</span>
+
+                            <span class="mb-v2-question-status js-mb-status">
+                                <span class="mb-v2-status-dot"></span>
+                                Не отвечено
+                            </span>
+                        </div>
+
+                    </article>
+
+                    {% endfor %}
+
+                </div>
+
+                <section class="mb-v2-submit-panel">
+                    <div>
+                        <span class="mb-v2-eyebrow">ПОСЛЕДНИЙ ШАГ</span>
+                        <h2>Завершить диагностику?</h2>
+                        <p>
+                            После отправки ответов MathBank подготовит
+                            результаты и анализ твоих знаний.
+                        </p>
+                    </div>
+
+                    <button type="submit" class="mb-v2-submit-button">
+                        Завершить диагностику
+                        <span>→</span>
+                    </button>
+                </section>
+
+            </form>
+
+        </main>
+
+        <aside class="mb-v2-sidebar">
+
+            <section class="mb-v2-side-card mb-v2-side-progress">
+                <span class="mb-v2-eyebrow">ТВОЙ ПРОГРЕСС</span>
+                <h3>Результат сессии</h3>
+
+                <div class="mb-v2-side-number">
+                    <strong id="mb-side-answered">0</strong>
+                    <span>/ {{ answers|length }}</span>
+                </div>
+
+                <p>заданий заполнено</p>
+
+                <div class="mb-v2-side-track">
+                    <div
+                        class="mb-v2-side-fill"
+                        id="mb-side-progress-fill"
+                    ></div>
+                </div>
+
+                <div class="mb-v2-side-progress-bottom">
+                    <span>Выполнено</span>
+                    <strong id="mb-side-percent">0%</strong>
+                </div>
+            </section>
+
+            <section class="mb-v2-side-card">
+                <div class="mb-v2-side-heading">
+                    <div>
+                        <span class="mb-v2-eyebrow">НАВИГАЦИЯ</span>
+                        <h3>Карта заданий</h3>
+                    </div>
+                    <span class="mb-v2-map-count">{{ answers|length }}</span>
+                </div>
+
+                <p class="mb-v2-side-description">
+                    Нажми на номер, чтобы перейти к нужному заданию.
+                </p>
+
+                <div class="mb-v2-navigation">
+                    {% for answer in answers %}
+                        <a
+                            href="#mb-question-{{ forloop.counter }}"
+                            class="mb-v2-nav-item js-mb-nav"
+                            data-question="{{ forloop.counter }}"
+                        >
+                            {{ forloop.counter|stringformat:"02d" }}
+                        </a>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-v2-legend">
+                    <span>
+                        <i class="mb-v2-legend-dot is-done"></i>
+                        Отвечено
+                    </span>
+                    <span>
+                        <i class="mb-v2-legend-dot"></i>
+                        Не отвечено
+                    </span>
+                </div>
+            </section>
+
+            <section class="mb-v2-tip">
+                <div class="mb-v2-tip-icon">✦</div>
+                <span class="mb-v2-eyebrow">СОВЕТ MATHBANK</span>
+                <h3>Не торопись</h3>
+                <p>
+                    Если задание вызывает трудности, можешь перейти
+                    к следующему и вернуться позже.
+                </p>
+            </section>
+
+            <div class="mb-v2-sidebar-footer">
+                <div class="mb-v2-footer-logo">M</div>
+                <div>
+                    <strong>MATHBANK</strong>
+                    <span>YOUR PERSONAL LEARNING SPACE</span>
+                </div>
+            </div>
+
+        </aside>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const inputs = document.querySelectorAll(".js-mb-answer");
+
+    const answeredCount = document.getElementById("mb-answered-count");
+    const progressPercent = document.getElementById("mb-progress-percent");
+    const progressFill = document.getElementById("mb-progress-fill");
+
+    const sideAnswered = document.getElementById("mb-side-answered");
+    const sidePercent = document.getElementById("mb-side-percent");
+    const sideFill = document.getElementById("mb-side-progress-fill");
+
+    const navigationItems = document.querySelectorAll(".js-mb-nav");
+
+    const total = inputs.length;
+
+    function updateProgress() {
+
+        let answered = 0;
+
+        inputs.forEach(function (input, index) {
+
+            const card = input.closest(".mb-v2-question-card");
+            const status = card.querySelector(".js-mb-status");
+            const navigationItem = navigationItems[index];
+
+            if (input.value.trim() !== "") {
+
+                answered++;
+
+                status.innerHTML =
+                    '<span class="mb-v2-status-dot"></span> Ответ заполнен';
+
+                status.classList.add("is-answered");
+
+                if (navigationItem) {
+                    navigationItem.classList.add("is-done");
+                }
+
+            } else {
+
+                status.innerHTML =
+                    '<span class="mb-v2-status-dot"></span> Не отвечено';
+
+                status.classList.remove("is-answered");
+
+                if (navigationItem) {
+                    navigationItem.classList.remove("is-done");
+                }
+            }
+        });
+
+        const percent = total > 0
+            ? Math.round((answered / total) * 100)
+            : 0;
+
+        answeredCount.textContent = answered;
+        progressPercent.textContent = percent + "%";
+        progressFill.style.width = percent + "%";
+
+        sideAnswered.textContent = answered;
+        sidePercent.textContent = percent + "%";
+        sideFill.style.width = percent + "%";
+    }
+
+    inputs.forEach(function (input) {
+        input.addEventListener("input", updateProgress);
+    });
+
+    updateProgress();
+
+});
+</script>
+{% endblock %}

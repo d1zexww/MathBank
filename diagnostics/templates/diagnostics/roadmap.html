@@ -1,0 +1,192 @@
+
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Моя дорожная карта — MathBank{% endblock %}
+
+{% block content %}
+
+<section class="mb-roadmap-page">
+
+    <div class="mb-roadmap-hero">
+        <div>
+            <span class="mb-roadmap-eyebrow">PERSONAL LEARNING PLAN</span>
+            <h1>Моя дорожная карта</h1>
+            <p>
+                Персональный план подготовки, построенный
+                на основе результатов твоих диагностик.
+            </p>
+        </div>
+
+        <div class="mb-roadmap-hero-icon">
+            <span>↗</span>
+        </div>
+    </div>
+
+    <!-- Статистика -->
+    <div class="mb-roadmap-stats">
+
+        <div class="mb-roadmap-stat">
+            <span class="mb-roadmap-stat-label">Всего тем</span>
+            <strong>{{ total_topics }}</strong>
+            <span class="mb-roadmap-stat-description">
+                Проанализировано системой
+            </span>
+        </div>
+
+        <div class="mb-roadmap-stat">
+            <span class="mb-roadmap-stat-label">Высокий приоритет</span>
+            <strong>{{ high_priority|length }}</strong>
+            <span class="mb-roadmap-stat-description">
+                Требуют внимания
+            </span>
+        </div>
+
+        <div class="mb-roadmap-stat">
+            <span class="mb-roadmap-stat-label">Средний приоритет</span>
+            <strong>{{ medium_priority|length }}</strong>
+            <span class="mb-roadmap-stat-description">
+                Требуют практики
+            </span>
+        </div>
+
+        <div class="mb-roadmap-stat">
+            <span class="mb-roadmap-stat-label">Освоенные темы</span>
+            <strong>{{ low_priority|length }}</strong>
+            <span class="mb-roadmap-stat-description">
+                Результат от 75%
+            </span>
+        </div>
+
+    </div>
+
+    <!-- Последовательность обучения -->
+    <div class="mb-roadmap-section">
+
+        <div class="mb-roadmap-section-heading">
+            <div>
+                <span class="mb-roadmap-eyebrow">YOUR NEXT STEPS</span>
+                <h2>План развития</h2>
+            </div>
+
+            <span class="mb-roadmap-counter">
+                {{ total_topics }} тем
+            </span>
+        </div>
+
+        {% if roadmap %}
+
+            <div class="mb-roadmap-group">
+
+                <div class="mb-roadmap-group-title">
+                    <span class="mb-roadmap-dot high"></span>
+                    <h3>Твоя последовательность обучения</h3>
+                    <span>{{ total_topics }}</span>
+                </div>
+
+                <p class="mb-roadmap-info">
+                    Темы расположены с учётом предварительных знаний.
+                    Начинай с первых шагов и постепенно двигайся дальше.
+                </p>
+
+                {% for item in roadmap %}
+
+                <article class="mb-roadmap-topic
+                    {% if item.priority == 'high' %}high
+                    {% elif item.priority == 'medium' %}medium
+                    {% elif item.priority == 'low' %}low
+                    {% else %}neutral{% endif %}">
+
+                    <!-- Название и результат -->
+                    <div class="mb-roadmap-topic-main">
+
+                        <div>
+                            <span class="mb-roadmap-subject">
+                                {{ item.subject_name }}
+                            </span>
+
+                            <h4>{{ item.topic }}</h4>
+                        </div>
+
+                        <strong>
+                            {% if item.answered %}
+                                {{ item.percentage }}%
+                            {% else %}
+                                —
+                            {% endif %}
+                        </strong>
+
+                    </div>
+
+                    <!-- Прогресс -->
+                    <div class="mb-roadmap-progress">
+                        <div style="width: {{ item.percentage }}%"></div>
+                    </div>
+
+                    <!-- Результат -->
+                    <div class="mb-roadmap-topic-footer">
+                        <span>
+                            {{ item.correct }} правильных
+                            из {{ item.answered }}
+                        </span>
+
+                        <span>
+                            {% if item.priority == 'high' %}
+                                Высокий приоритет
+                            {% elif item.priority == 'medium' %}
+                                Средний приоритет
+                            {% elif item.priority == 'low' %}
+                                Освоено
+                            {% else %}
+                                Недостаточно данных
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <!-- Рекомендации -->
+                    <div class="mb-roadmap-recommendation">
+
+                        <span class="mb-roadmap-order">
+                            ШАГ {{ item.study_order }}
+                        </span>
+
+                        <strong>{{ item.status_label }}</strong>
+
+                        <p>{{ item.recommendation }}</p>
+
+                        <small>{{ item.study_reason }}</small>
+
+                    </div>
+
+                </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="mb-roadmap-empty">
+
+                <div class="mb-roadmap-empty-icon">↗</div>
+
+                <h3>Пока нет данных для дорожной карты</h3>
+
+                <p>
+                    Пройди первую диагностику, и MathBank
+                    составит персональный план подготовки.
+                </p>
+
+                <a href="{% url 'diagnostics:start' %}">
+                    Начать диагностику
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

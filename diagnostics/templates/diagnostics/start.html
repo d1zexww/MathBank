@@ -1,0 +1,213 @@
+
+{% extends 'core/base.html' %}
+
+{% block title %}Диагностика — MathBank{% endblock %}
+
+{% block content %}
+
+<header class="dashboard-heading">
+
+    <div>
+        <p class="dashboard-eyebrow">
+            MATHBANK / ДИАГНОСТИКА
+        </p>
+
+        <h1>Проверь свои знания</h1>
+
+        <p>
+            Выбери предмет, тему и количество заданий.
+            MathBank поможет определить твой текущий уровень подготовки.
+        </p>
+    </div>
+
+    <span class="student-badge">
+        Диагностика
+    </span>
+
+</header>
+
+
+<section class="dashboard-section">
+
+    <div class="dashboard-section-heading">
+
+        <div>
+            <h2>Настрой диагностику</h2>
+
+            <p>
+                Выбери параметры тестирования перед началом.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="diagnostic-card">
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <div class="form-group">
+
+                <label for="subject">Предмет</label>
+
+                <select name="subject" id="subject" required>
+
+                    <option value="">Выбери предмет</option>
+
+                    <option value="profile_math">
+                        Профильная математика
+                    </option>
+
+                    <option value="russian">
+                        Русский язык
+                    </option>
+
+                    <option value="english">
+                        Английский язык
+                    </option>
+
+                    <option value="informatics">
+                        Информатика
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="topic">Тема</label>
+
+                <select name="topic" id="topic">
+
+                    <option value="">Все темы</option>
+
+                    <option value="Свойства степеней">Свойства степеней</option>
+                    <option value="Квадратные корни">Квадратные корни</option>
+                    <option value="Преобразование корней">Преобразование корней</option>
+                    <option value="Логарифмы">Логарифмы</option>
+                    <option value="Тригонометрия">Тригонометрия</option>
+                    <option value="Степени и корни">Степени и корни</option>
+                    <option value="Дробные показатели степени">Дробные показатели степени</option>
+                    <option value="Отрицательная степень">Отрицательная степень</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="ege_task_number">
+                    Номер задания ЕГЭ
+                </label>
+
+                <select name="ege_task_number" id="ege_task_number">
+
+                    <option value="">Все задания</option>
+
+                    {% for number in task_numbers %}
+
+                        <option value="{{ number }}">
+                            Задание №{{ number }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="question_count">
+                    Количество заданий
+                </label>
+
+                <select name="question_count" id="question_count">
+
+                    <option value="5">5 заданий</option>
+                    <option value="10" selected>10 заданий</option>
+                    <option value="12">12 заданий</option>
+                    <option value="15">15 заданий</option>
+                    <option value="20">20 заданий</option>
+
+                </select>
+
+            </div>
+
+
+            <button type="submit" class="diagnostic-button">
+                Начать диагностику →
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+
+<section class="dashboard-section">
+
+    <div class="dashboard-section-heading">
+
+        <div>
+            <h2>Как это работает</h2>
+
+            <p>
+                Три простых шага к пониманию своего уровня.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="dashboard-tools">
+
+        <article class="dashboard-tool-card">
+
+            <div class="tool-icon">01</div>
+
+            <h3>Выбери тему</h3>
+
+            <p>
+                Работай над конкретными разделами ЕГЭ.
+            </p>
+
+        </article>
+
+
+        <article class="dashboard-tool-card">
+
+            <div class="tool-icon">02</div>
+
+            <h3>Реши задания</h3>
+
+            <p>
+                Проверь свои знания на практике.
+            </p>
+
+        </article>
+
+
+        <article class="dashboard-tool-card">
+
+            <div class="tool-icon">03</div>
+
+            <h3>Получи результат</h3>
+
+            <p>
+                Узнай, над чем стоит поработать.
+            </p>
+
+        </article>
+
+    </div>
+
+</section>
+
+{% endblock %}

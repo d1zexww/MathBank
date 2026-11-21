@@ -1,0 +1,242 @@
+
+{% extends 'core/base.html' %}
+
+{% block title %}Личный кабинет — MathBank{% endblock %}
+
+{% block content %}
+
+<!-- Приветствие -->
+<header class="dashboard-heading">
+
+    <div>
+        <p class="dashboard-eyebrow">
+            ЛИЧНЫЙ КАБИНЕТ
+        </p>
+
+        <h1>
+            Привет, {{ user.username }}!
+        </h1>
+
+        <p>
+            Добро пожаловать в твоё пространство подготовки.
+        </p>
+    </div>
+
+    <span class="student-badge">
+        Ученик
+    </span>
+
+</header>
+
+
+<!-- Учебные данные -->
+<section class="dashboard-section">
+
+    <div class="dashboard-section-heading">
+
+        <div>
+            <h2>Твои учебные данные</h2>
+
+            <p>
+                Твоя информация и цели подготовки.
+            </p>
+        </div>
+
+        <a href="{% url 'accounts:profile' %}"
+           class="dashboard-button">
+            Редактировать
+        </a>
+
+    </div>
+
+    <div class="dashboard-tools">
+
+        <article class="dashboard-tool-card">
+
+            <p>Имя ученика</p>
+
+            <h3>
+                {{ profile.full_name|default:user.username }}
+            </h3>
+
+        </article>
+
+        <article class="dashboard-tool-card">
+
+            <p>Основной предмет</p>
+
+            <h3>
+                {% if profile.main_subject %}
+                    {{ profile.get_main_subject_display }}
+                {% else %}
+                    Не выбран
+                {% endif %}
+            </h3>
+
+        </article>
+
+        <article class="dashboard-tool-card">
+
+            <p>Желаемый результат</p>
+
+            <h3>
+                {% if profile.target_score %}
+                    {{ profile.target_score }} баллов
+                {% else %}
+                    Не указан
+                {% endif %}
+            </h3>
+
+        </article>
+
+    </div>
+
+</section>
+
+
+<!-- Приветственный блок -->
+<section class="dashboard-welcome">
+
+    <div>
+
+        <p class="welcome-label">
+            ТВОЙ СЛЕДУЮЩИЙ ШАГ
+        </p>
+
+        <h2>
+            Начни с диагностики знаний
+        </h2>
+
+        <p>
+            Определи свой текущий уровень,
+            чтобы построить индивидуальный маршрут подготовки.
+        </p>
+
+        <a href="{% url 'diagnostics:start' %}"
+           class="dashboard-button">
+            Пройти диагностику
+        </a>
+
+    </div>
+
+    <div class="welcome-mark">
+        MB
+    </div>
+
+</section>
+
+
+<!-- Индивидуальный маршрут -->
+<section class="dashboard-section" id="roadmap">
+
+    <div class="dashboard-section-heading">
+
+        <div>
+            <h2>Индивидуальный маршрут</h2>
+
+            <p>
+                Твой персональный путь к желаемому результату.
+            </p>
+        </div>
+
+        <span class="roadmap-status">
+            Пока не создан
+        </span>
+
+    </div>
+
+    <div class="roadmap-empty">
+
+        <div class="roadmap-empty-icon">
+            R
+        </div>
+
+        <h3>
+            Здесь появится твой маршрут
+        </h3>
+
+        <p>
+            Сначала необходимо определить твой уровень знаний
+            и учебную цель.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- Инструменты подготовки -->
+<section class="dashboard-section" id="study-tools">
+
+    <div class="dashboard-section-heading">
+
+        <div>
+            <h2>Инструменты подготовки</h2>
+
+            <p>
+                Всё необходимое для достижения твоей цели.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="dashboard-tools">
+
+        <article class="dashboard-tool-card">
+
+            <div class="tool-icon">AI</div>
+
+            <h3>AI Mode</h3>
+
+            <p>
+                Персональный ИИ-помощник
+                для изучения теории и разбора заданий.
+            </p>
+
+            <span class="tool-status">
+                В разработке
+            </span>
+
+        </article>
+
+
+        <article class="dashboard-tool-card">
+
+            <div class="tool-icon">T</div>
+
+            <h3>Teacher Mode</h3>
+
+            <p>
+                Авторские курсы,
+                уроки и материалы преподавателей.
+            </p>
+
+            <span class="tool-status">
+                В разработке
+            </span>
+
+        </article>
+
+
+        <article class="dashboard-tool-card">
+
+            <div class="tool-icon">B</div>
+
+            <h3>Банк заданий</h3>
+
+            <p>
+                Практические задания
+                для подготовки к экзаменам.
+            </p>
+
+            <span class="tool-status">
+                В разработке
+            </span>
+
+        </article>
+
+    </div>
+
+</section>
+
+{% endblock %}
